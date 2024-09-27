@@ -1,21 +1,39 @@
 package net.dialectech.f2aApplication;
 
-public class CToneGenerator extends CToneGeneratorBase {
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
-	public void startPlayTone(int frequency) {
-		sdl.start();
+public class CToneGenerator extends Service<String> {
+	// グローバル変数0
 
-		new Thread(new Runnable() {
+	CTGSupporter sup;
+	private Mixer mixer;
 
-			@Override
-			public void run() {
-				while (comMem.isKeydown()) {
-					sdl.write(byteBuffer, 0, byteBuffer.length);
-				}
-				sdl.flush();
-				sdl.stop();
-			}			
-		}).start();
+	public CToneGenerator() {
+		super();
+		mixer = AudioSystem.getMixer(null); // オブジェクト生成時には、デフォルトのAudioSystemMixerを設定
+		sup = new CTGSupporter(mixer);
+	}
+
+	@Override
+	protected Task<String> createTask() {
+		return sup;
+	}
+
+	// モニター用オーディオデバイス
+	public void reOpenToneGenerator(int frequency, double volume, Mixer mixer) {
+		sup.reOpenToneGenerator(frequency, volume, mixer);
+	}
+
+	// リグ接続用オーディオデバイス
+	public void reOpenToneGenerator(int frequency, double micVolume, Mixer targetMixer, double atackDelay) {
+		sup.reOpenToneGenerator(frequency, micVolume, targetMixer, atackDelay);
+	}
+
+	public void closeToneGenerator() {
+		sup.closeToneGenerator();		
 	}
 
 }
