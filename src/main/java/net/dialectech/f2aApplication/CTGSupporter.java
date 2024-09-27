@@ -10,7 +10,7 @@ import lombok.Setter;
 
 public class CTGSupporter extends Task<String> {
 
-	final long SYSTEM_DELAY_MS = 0 ;
+	final long SYSTEM_DELAY_MS = 0;
 	private AudioFormat af;
 	private SourceDataLine sdl;
 	protected CComCenter comCenter = CComCenter.getInstance();
@@ -19,12 +19,13 @@ public class CTGSupporter extends Task<String> {
 	@Setter
 	private long atackDelayTime;
 
-	byte[] byteBuffer; // 音声用バッファ
+	byte[] byteBufferToneOn; // 音声用バッファ(TONE ON の場合)
+	byte[] byteBufferToneOff; // 音声用バッファ(TONE OFF の場合)
 
 	private int pointer2ReadTiming;
 	boolean keyOn = false;
 
-	Thread coreToneGenerator = createNewSingleToneThread();
+	Thread coreToneGenerator;
 
 	public CTGSupporter(Mixer mixer) {
 		super();
@@ -37,15 +38,28 @@ public class CTGSupporter extends Task<String> {
 		return new Thread(new Runnable() {
 			@Override
 			public void run() {
+				boolean formerStatus = false;
 				if (sdl != null) {
 					sdl.start();
-					while (keyOn) {
-						sdl.write(byteBuffer, 0, byteBuffer.length);
-						if (Thread.currentThread().isInterrupted())
+					for (;;) {
+						if ((keyOn && !formerStatus) || (!keyOn && formerStatus)) {
+							sdl.flush();
+							sdl.stop();
+							sdl.start();
+						}
+						if (keyOn) {
+							formerStatus = keyOn;
+							sdl.write(byteBufferToneOn, 0, byteBufferToneOn.length);
+						} else {
+							formerStatus = keyOn;
+							sdl.write(byteBufferToneOff, 0, byteBufferToneOff.length);
+						}
+						if (Thread.currentThread().isInterrupted()) {
+							System.out.println("Tone Generator Broken.");
 							break;
+						}
 					}
-					sdl.flush();
-					sdl.stop();
+
 				}
 			}
 		});
@@ -54,8 +68,13 @@ public class CTGSupporter extends Task<String> {
 	@Override
 	protected String call() throws Exception {
 		long pressedEventTime = 0;
+		coreToneGenerator = createNewSingleToneThread();
+		startPlayTone();
+
 		for (;;) {
 			if (isCancelled()) {
+				if (coreToneGenerator != null)
+					coreToneGenerator.interrupt();
 				break;
 			}
 			if ((pointer2ReadTiming == comCenter.PointerOfTimeStamp)
@@ -72,19 +91,17 @@ public class CTGSupporter extends Task<String> {
 			case KEY_PRESSED:
 				if ((eventTime + atackDelayTime) < presentTime) {
 					// Key on直後を検出
-					keyOn = true;
-					startPlayTone();
 					incrementPointer2ReadTiming();
+					keyOn = true;
 				}
 				pressedEventTime = eventTime;
 				break;
 			case KEY_RELEASED:
-				if (((pressedEventTime - SYSTEM_DELAY_MS > eventTime) || ((eventTime + atackDelayTime - SYSTEM_DELAY_MS) < presentTime))
-						&& keyOn) {
+				if (((pressedEventTime - SYSTEM_DELAY_MS > eventTime)
+						|| ((eventTime + atackDelayTime - SYSTEM_DELAY_MS) < presentTime)) && keyOn) {
 					// Key off直後を検出
 					incrementPointer2ReadTiming();
 					keyOn = false;
-					coreToneGenerator = createNewSingleToneThread();
 				}
 				break;
 			default:
@@ -104,14 +121,19 @@ public class CTGSupporter extends Task<String> {
 	public void fillSoundBuffer(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(一周期分のみ生成する。)
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
-		byteBuffer = new byte[bufferSize * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOn = new byte[bufferSize * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[bufferSize * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
 		for (int i = 0, index = 0; i < bufferSize; i++) {
 			double angle = 2.0 * Math.PI * i / bufferSize;
 			pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
-			byteBuffer[index++] = (byte) ((pointData >> 8) & 0xff);
-			byteBuffer[index++] = (byte) (pointData & 0xff);
+			byteBufferToneOn[index++] = (byte) ((pointData >> 8) & 0xff);
+			byteBufferToneOn[index++] = (byte) (pointData & 0xff);
+		}
+		for (int i = 0, index = 0; i < bufferSize; i++) {
+			byteBufferToneOff[index++] = (byte) 0;
+			byteBufferToneOff[index++] = (byte) 0;
 		}
 	}
 
@@ -149,6 +171,7 @@ public class CTGSupporter extends Task<String> {
 
 			sdl.open(af);
 			fillSoundBuffer(frequency, volume);
+			startPlayTone();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -158,7 +181,8 @@ public class CTGSupporter extends Task<String> {
 		if (sdl == null) {
 			return;
 		}
-		coreToneGenerator.start();
+		if (coreToneGenerator!=null)
+			coreToneGenerator.start();
 	}
 
 	public void startPlayTone(int frequency, double volume) {
