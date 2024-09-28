@@ -123,6 +123,7 @@ public class CComCenter {
 		frequencyMap.put("人間関係の向上",639 );
 		frequencyMap.put("直感力・想像力UP",741 );
 		frequencyMap.put("松果体の活性・霊性UP",852 );
+		frequencyMap.put("宇宙と結合",963 );
 		frequencyMap.put("10Hz毎",-1 );
 		
 		rigList = new LinkedList<String>();
