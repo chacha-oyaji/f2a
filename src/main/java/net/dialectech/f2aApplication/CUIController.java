@@ -46,9 +46,9 @@ public class CUIController {
 	@FXML // fx:id="dbComPort4Rig"
 	private ChoiceBox<String> dbComPort4Rig; // Value injected by FXMLLoader
 
-    @FXML // fx:id="dbComPort4KeyCDC"
-    private ChoiceBox<String> dbComPort4KeyCDC;
-    
+	@FXML // fx:id="dbComPort4KeyCDC"
+	private ChoiceBox<String> dbComPort4KeyCDC;
+
 	@FXML // fx:id="sbAfVolume"
 	public ScrollBar sbAfVolume; // Value injected by FXMLLoader
 
@@ -63,6 +63,9 @@ public class CUIController {
 
 	@FXML // fx:id="sbToneFrequency"
 	public ScrollBar sbToneFrequency; // Value injected by FXMLLoader
+
+	@FXML
+	private ChoiceBox<String> dbPrimaryToneSelection;
 
 	@FXML
 	public ChoiceBox<String> dbTransmitterDestination;
@@ -146,47 +149,42 @@ public class CUIController {
 		sbAfVolume.valueProperty().addListener((ov, old_val, new_Val) -> {
 			lblMicOutputVolume.setText(String.valueOf((int) new_Val.doubleValue()) + " %");
 			comCenter.setMicVolume(new_Val.doubleValue());
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 //			if (comCenter != null && comCenter.getSendReceiveController() != null)
 //				comCenter.getSendReceiveController().cancel();
 		});
 		sbMonitorVolume.valueProperty().addListener((ov, old_val, new_Val) -> {
 			lblMonitorVolume.setText(String.valueOf((int) new_Val.doubleValue()) + " %");
 			comCenter.setMonitorVolume(new_Val.doubleValue());
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 //			if (comCenter != null && comCenter.getSendReceiveController() != null)
 //				comCenter.getSendReceiveController().cancel();
 		});
 		sbAtackDelay.valueProperty().addListener((ov, old_val, new_Val) -> {
 			lblAtackDelay.setText(String.valueOf((int) new_Val.doubleValue()) + " mS");
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 		});
-		sbToneFrequency.valueProperty().addListener((ov, old_val, new_Val) -> {
-			lblToneFrequency.setText(String.valueOf((int) new_Val.doubleValue()) + " Hz");
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
-		});
+
 		cbBreakIn.selectedProperty().addListener((ov, old_val, new_Val) -> {
 			comCenter.setBreakInMode(new_Val.booleanValue());
 		});
-		
-		
+
 		dbAudioPort.valueProperty().addListener((ov, old_val, new_Val) -> {
 			System.out.println("CHANGED TO " + new_Val);
 			String target = dbAudioPort.getValue();
 			Mixer mixer = comCenter.mixerMap.get(target);
 			if (mixer == null)
 				mixer = AudioSystem.getMixer(null);
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 			// comCenter.getToneGeneratorArray().get(1).setMixer(mixer);
 //			if (comCenter != null && comCenter.getSendReceiveController() != null)
 //				comCenter.getSendReceiveController().cancel();
 		});
-		
+
 		dbComPort4KeyCDC.valueProperty().addListener((ov, old_val, new_Val) -> {
 			System.out.println("KEY PORT is CHANGED TO " + new_Val);
 			String target = dbComPort4KeyCDC.getValue();
@@ -195,28 +193,49 @@ public class CUIController {
 		});
 
 		sbToneFrequency.valueProperty().addListener((ov, old_val, new_Val) -> {
-			double newData = (((int) new_Val.doubleValue()) / 10) * 10.0;
-			sbToneFrequency.setValue(newData);
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
-					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
-//			if (comCenter != null && comCenter.getSendReceiveController() != null)
-//				comCenter.getSendReceiveController().cancel();
+			int primaryFreqData ;
+			if (dbPrimaryToneSelection.getValue()==null) {
+				primaryFreqData = -1; 
+			}
+			else {
+				primaryFreqData = comCenter.frequencyMap.get(dbPrimaryToneSelection.getValue());
+			}
+			// このスライドバーを使えるのは、primaryFreqDataが「10Hz毎」になっているときのみ
+			if (primaryFreqData == -1) {
+				double newData = (((int) new_Val.doubleValue()) / 10) * 10.0;
+				sbToneFrequency.setValue(newData);
+				lblToneFrequency.setText(String.valueOf((int) newData) + " Hz");
+				comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+						sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			}
 		});
 		sbAtackDelay.valueProperty().addListener((ov, old_val, new_Val) -> {
 			double newData = (((int) new_Val.doubleValue()) / 100) * 100.0;
 			sbAtackDelay.setValue(newData);
 			lblAtackDelay.setText(String.valueOf((int) newData) + " mS");
 			comCenter.setAtackDelay((long) new_Val.doubleValue());
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 		});
 		sbReleaseDelay.valueProperty().addListener((ov, old_val, new_Val) -> {
 			double newData = (((int) new_Val.doubleValue()) / 100) * 100.0;
 			sbReleaseDelay.setValue(newData);
 			lblReleaseDelay.setText(String.valueOf((int) newData) + " mS");
 			comCenter.setReleaseDelay((long) new_Val.doubleValue());
-			comCenter.reOpenAllDevices(sbToneFrequency.getValue(),dbAudioPort.getValue(), sbAtackDelay.getValue(), sbReleaseDelay.getValue(),
-					sbAfVolume.getValue(), sbMonitorVolume.getValue());
+			comCenter.reOpenAllDevices(sbToneFrequency.getValue(), dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
+		});
+		dbPrimaryToneSelection.valueProperty().addListener((ov, old_val, new_Val) -> {
+			int newData = comCenter.frequencyMap.get(new_Val);
+			if (newData != -1) {
+				sbToneFrequency.disableProperty().set(true);
+			} else {
+				sbToneFrequency.disableProperty().set(false);
+				newData = (int) sbToneFrequency.getValue();
+			}
+			lblToneFrequency.setText(String.valueOf((int) newData) + " Hz");
+			comCenter.reOpenAllDevices(newData, dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 		});
 
 		sbAfVolume.setMax(100.0);
@@ -249,7 +268,7 @@ public class CUIController {
 		}
 		dbComPort4Rig.getItems().addAll(comPortList);
 		dbComPort4KeyCDC.getItems().addAll(comPortList);
-		
+		dbPrimaryToneSelection.getItems().addAll(comCenter.getFrequencyNameList());
 		dbTransmitterDestination.getItems().addAll(comCenter.getRigList());
 	}
 
