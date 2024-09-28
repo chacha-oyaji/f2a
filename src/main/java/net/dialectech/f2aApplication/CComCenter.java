@@ -116,6 +116,7 @@ public class CComCenter {
 
 		frequencyMap = new LinkedHashMap<String, Integer>();
 		frequencyMap.put("安全・安定感UP",174 );
+		frequencyMap.put("催淫・陶酔効果",256 );
 		frequencyMap.put("細胞組織再生促進・記憶力UP",285 );
 		frequencyMap.put("恐怖からの解放",396 );
 		frequencyMap.put("変化・転換促進、マイナス思考からの解放",417 );
