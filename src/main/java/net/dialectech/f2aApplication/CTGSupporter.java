@@ -57,11 +57,9 @@ public class CTGSupporter extends Task<String> {
 							// sdl.write(byteBufferToneOff, 0, byteBufferToneOff.length);
 						}
 						if (Thread.currentThread().isInterrupted()) {
-							System.out.println("Tone Generator Broken.");
 							break;
 						}
 					}
-
 				}
 			}
 		});
@@ -118,6 +116,8 @@ public class CTGSupporter extends Task<String> {
 			sdl.close();
 			sdl = null;
 		}
+		if (coreToneGenerator!=null && coreToneGenerator.isAlive())
+			coreToneGenerator.interrupt();
 	}
 
 	public void fillSoundBuffer(int frequency, double volume) {
@@ -183,8 +183,18 @@ public class CTGSupporter extends Task<String> {
 		if (sdl == null) {
 			return;
 		}
-		if (coreToneGenerator != null)
-			coreToneGenerator.start();
+		if (coreToneGenerator != null) {
+			coreToneGenerator.interrupt();
+			while (coreToneGenerator.isAlive())
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			coreToneGenerator = createNewSingleToneThread();
+		}
+		coreToneGenerator.start();
 	}
 
 	public void startPlayTone(int frequency, double volume) {

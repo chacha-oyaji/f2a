@@ -21,6 +21,7 @@ public class Main extends Application {
 
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("F2A Generator by JI1BXM");
+
 			primaryStage.show();
 
 			controller = fxmlLoader.getController();
@@ -75,6 +76,10 @@ public class Main extends Application {
 			tg2.start();
 			/*
 			*/
+			primaryStage.setOnCloseRequest(event -> {
+				tg1.closeToneGenerator() ;
+				tg2.closeToneGenerator() ;
+			});
 
 		} catch (Exception e) {
 			e.printStackTrace();

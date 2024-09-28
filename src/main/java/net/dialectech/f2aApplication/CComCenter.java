@@ -58,7 +58,7 @@ public class CComCenter {
 	private boolean lateKeyUp;
 
 	// CW Event Timing Records
-	public final int TIME_STAMP_VOL = 1024;
+	public final int TIME_STAMP_VOL = 16;
 	public long timeStamp[] = new long[TIME_STAMP_VOL];
 	public EKeyStat keyStat[] = new EKeyStat[TIME_STAMP_VOL];
 	public int PointerOfTimeStamp;
@@ -196,22 +196,25 @@ public class CComCenter {
 	public synchronized void addNewTimeStamp(long timeStamp2Store, EKeyStat status) {
 		// 重複検出して、前回のものと同じKeyStatを登録しようとしているのであれば、エラーなので、登録しない。
 		int checkPoint = PointerOfTimeStamp;
-		if (checkPoint == 0 && keyStat[0] == EKeyStat.KeyNull) {
-			checkPoint = TIME_STAMP_VOL - 1;
-		}
-		if (checkPoint != 0)
+		if (checkPoint == 0 ) {
+			if (keyStat[0] == EKeyStat.KeyNull)
+				checkPoint = TIME_STAMP_VOL - 1;
+		} else if (checkPoint != 0) {
 			checkPoint--;
+		}
 
 		if (status == keyStat[checkPoint])
 			return;
 
+		// System.out.println(">> " + PointerOfTimeStamp);
 		// 登録作業
 		timeStamp[PointerOfTimeStamp] = timeStamp2Store;
 		keyStat[PointerOfTimeStamp++] = status;
 		if (PointerOfTimeStamp >= TIME_STAMP_VOL)
 			PointerOfTimeStamp = 0;
 		keyStat[PointerOfTimeStamp] = EKeyStat.KeyNull;
-		//System.out.println("ADD NEW TIME-STAMP : " + timeStamp2Store + " as " + status.toString());
+		// System.out.println("ADD NEW TIME-STAMP : " + timeStamp2Store + " as " +
+		// status.toString());
 	}
 
 	public void addToneGenerator(CToneGenerator tg) {
@@ -232,16 +235,15 @@ public class CComCenter {
 			tg.closeToneGenerator();
 		}
 	}
-	
+
 	public void reOpenKeyHandler(String keyPort) {
-		if (keyHandler==null) {
-			Platform.runLater(()->{
-				
+		if (keyHandler == null) {
+			Platform.runLater(() -> {
+
 			});
-		}
-		else {
-			keyHandler.reOpen(keyPort) ;
-			
+		} else {
+			keyHandler.reOpen(keyPort);
+
 		}
 	}
 
@@ -256,6 +258,7 @@ public class CComCenter {
 			case INDEX_FOR_MONITOR:
 				// index=0のものは、モニター用
 				targetMixer = AudioSystem.getMixer(null); // モニターにはデフォルトを設定。
+				tg.closeToneGenerator();
 				tg.reOpenToneGenerator((int) frequency, monitorVolume, targetMixer);
 				break;
 			case INDEX_FOR_MIC_OUTPUT:
@@ -268,6 +271,7 @@ public class CComCenter {
 				if (targetMixer == null) {
 					targetMixer = AudioSystem.getMixer(null); // 異常があればデフォルトを設定。
 				}
+				tg.closeToneGenerator();
 				tg.reOpenToneGenerator((int) frequency, micVolume, targetMixer, atackDelay);
 				break;
 			default:
