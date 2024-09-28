@@ -42,17 +42,19 @@ public class CTGSupporter extends Task<String> {
 				if (sdl != null) {
 					sdl.start();
 					for (;;) {
-						if ((keyOn && !formerStatus) || (!keyOn && formerStatus)) {
+						boolean presentKeyStat = keyOn;
+						if ((presentKeyStat && !formerStatus) || (!presentKeyStat && formerStatus)) {
 							sdl.flush();
 							sdl.stop();
 							sdl.start();
 						}
-						if (keyOn) {
-							formerStatus = keyOn;
-							sdl.write(byteBufferToneOn, 0, byteBufferToneOn.length);
+						if (presentKeyStat) {
+							formerStatus = presentKeyStat;
+							if (sdl.available() > 30000)
+								sdl.write(byteBufferToneOn, 0, byteBufferToneOn.length);
 						} else {
-							formerStatus = keyOn;
-							sdl.write(byteBufferToneOff, 0, byteBufferToneOff.length);
+							formerStatus = presentKeyStat;
+							// sdl.write(byteBufferToneOff, 0, byteBufferToneOff.length);
 						}
 						if (Thread.currentThread().isInterrupted()) {
 							System.out.println("Tone Generator Broken.");
@@ -181,7 +183,7 @@ public class CTGSupporter extends Task<String> {
 		if (sdl == null) {
 			return;
 		}
-		if (coreToneGenerator!=null)
+		if (coreToneGenerator != null)
 			coreToneGenerator.start();
 	}
 
