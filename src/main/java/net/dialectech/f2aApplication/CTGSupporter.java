@@ -35,12 +35,15 @@ public class CTGSupporter extends Task<String> {
 
 	private Thread createNewSingleToneThread() {
 		// TODO 自動生成されたメソッド・スタブ
-		return new Thread(new Runnable() {
+		Thread toneGenerationCore = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				boolean formerStatus = false;
+				int maxAvailableVol;
 				if (sdl != null) {
 					sdl.start();
+					maxAvailableVol = sdl.available() * 1 / 3;
+
 					for (;;) {
 						boolean presentKeyStat = keyOn;
 						if ((presentKeyStat && !formerStatus) || (!presentKeyStat && formerStatus)) {
@@ -50,7 +53,7 @@ public class CTGSupporter extends Task<String> {
 						}
 						if (presentKeyStat) {
 							formerStatus = presentKeyStat;
-							if (sdl.available() > 30000)
+							if (sdl.available() > maxAvailableVol)
 								sdl.write(byteBufferToneOn, 0, byteBufferToneOn.length);
 						} else {
 							formerStatus = presentKeyStat;
@@ -59,14 +62,22 @@ public class CTGSupporter extends Task<String> {
 						if (Thread.currentThread().isInterrupted()) {
 							break;
 						}
+						try {
+							Thread.sleep(0,1000);
+						} catch (InterruptedException e) {
+							break;
+						}
 					}
 				}
 			}
 		});
+		toneGenerationCore.setName("ToneGenerationCore");
+		return toneGenerationCore;
 	}
 
 	@Override
 	protected String call() throws Exception {
+		Thread.currentThread().setName("Tone Generator Handler");
 		long pressedEventTime = 0;
 		coreToneGenerator = createNewSingleToneThread();
 		startPlayTone();
@@ -75,6 +86,11 @@ public class CTGSupporter extends Task<String> {
 			if (isCancelled()) {
 				if (coreToneGenerator != null)
 					coreToneGenerator.interrupt();
+				break;
+			}
+			try {
+				Thread.sleep(0,10000);
+			} catch (InterruptedException e) {
 				break;
 			}
 			if ((pointer2ReadTiming == comCenter.PointerOfTimeStamp)
@@ -116,24 +132,24 @@ public class CTGSupporter extends Task<String> {
 			sdl.close();
 			sdl = null;
 		}
-		if (coreToneGenerator!=null && coreToneGenerator.isAlive())
+		if (coreToneGenerator != null && coreToneGenerator.isAlive())
 			coreToneGenerator.interrupt();
 	}
 
 	public void fillSoundBuffer(int frequency, double volume) {
-		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(一周期分のみ生成する。)
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
-		byteBufferToneOn = new byte[bufferSize * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
-		byteBufferToneOff = new byte[bufferSize * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOn = new byte[bufferSize * 200]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[bufferSize * 200]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
-		for (int i = 0, index = 0; i < bufferSize; i++) {
+		for (int i = 0, index = 0; i < bufferSize * 100; i++) {
 			double angle = 2.0 * Math.PI * i / bufferSize;
 			pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
 			byteBufferToneOn[index++] = (byte) ((pointData >> 8) & 0xff);
 			byteBufferToneOn[index++] = (byte) (pointData & 0xff);
 		}
-		for (int i = 0, index = 0; i < bufferSize; i++) {
+		for (int i = 0, index = 0; i < bufferSize * 100; i++) {
 			byteBufferToneOff[index++] = (byte) 0;
 			byteBufferToneOff[index++] = (byte) 0;
 		}

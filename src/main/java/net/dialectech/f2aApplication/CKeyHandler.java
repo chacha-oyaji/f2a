@@ -27,7 +27,12 @@ public class CKeyHandler extends Service<String> {
 					if (isCancelled()) {
 						break;
 					}
-					Thread.sleep(1);
+					try {
+						Thread.sleep(0,10000);
+					} catch (InterruptedException e) {
+						break;
+					}
+
 					if (sp == null)
 						continue ;
 					int vol = sp.readBytes(buffer, 1);

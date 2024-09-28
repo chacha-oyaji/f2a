@@ -42,6 +42,14 @@ public class CSendReceiveController extends Service<String> {
 					if (isCancelled()) {
 						break;
 					}
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						// TODO 自動生成された catch ブロック
+						e.printStackTrace();
+						break;
+					}
+
 					if (comCenter.isBreakInMode()) {
 						// Break-Inモードの場合の処理
 						long presentTime = System.currentTimeMillis();
@@ -88,8 +96,6 @@ public class CSendReceiveController extends Service<String> {
 							finalReleaseTime = eventTime + releaseDelayTime;
 							break;
 						}
-
-
 					} else {
 						// PTTモードの場合の処理
 						if (!comCenter.isBreakInMode()) {

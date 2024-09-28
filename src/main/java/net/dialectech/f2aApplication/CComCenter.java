@@ -58,7 +58,7 @@ public class CComCenter {
 	private boolean lateKeyUp;
 
 	// CW Event Timing Records
-	public final int TIME_STAMP_VOL = 16;
+	public final int TIME_STAMP_VOL = 128;
 	public long timeStamp[] = new long[TIME_STAMP_VOL];
 	public EKeyStat keyStat[] = new EKeyStat[TIME_STAMP_VOL];
 	public int PointerOfTimeStamp;

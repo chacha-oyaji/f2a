@@ -38,7 +38,7 @@ public class Main extends Application {
 				tg1.restart();
 			});
 			tg1.start();
-
+			
 			CSendReceiveController srController = new CSendReceiveController(controller);
 			comMem.setSendReceiveController(srController);
 			srController.setOnSucceeded((value) -> {
