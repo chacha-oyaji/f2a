@@ -20,8 +20,7 @@ public class CTGSupporter extends Task<String> {
 	private long atackDelayTime;
 
 	byte[] byteBufferToneOn; // 音声用バッファ(TONE ON の場合)
-	byte[] byteBufferToneOff; // 音声用バッファ(TONE OFF の場合)
-
+	
 	private int pointer2ReadTiming;
 	boolean keyOn = false;
 
@@ -63,7 +62,7 @@ public class CTGSupporter extends Task<String> {
 							break;
 						}
 						try {
-							Thread.sleep(0,1000);
+							Thread.sleep(0, 1000);
 						} catch (InterruptedException e) {
 							break;
 						}
@@ -89,7 +88,7 @@ public class CTGSupporter extends Task<String> {
 				break;
 			}
 			try {
-				Thread.sleep(0,10000);
+				Thread.sleep(0, 10000);
 			} catch (InterruptedException e) {
 				break;
 			}
@@ -140,18 +139,13 @@ public class CTGSupporter extends Task<String> {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[bufferSize * 200]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
-		byteBufferToneOff = new byte[bufferSize * 200]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
 		for (int i = 0, index = 0; i < bufferSize * 100; i++) {
-			double angle = 2.0 * Math.PI * i / bufferSize;
+			double angle = 2.0 * Math.PI * i / bufferSize ;
 			pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
 			byteBufferToneOn[index++] = (byte) ((pointData >> 8) & 0xff);
 			byteBufferToneOn[index++] = (byte) (pointData & 0xff);
-		}
-		for (int i = 0, index = 0; i < bufferSize * 100; i++) {
-			byteBufferToneOff[index++] = (byte) 0;
-			byteBufferToneOff[index++] = (byte) 0;
 		}
 	}
 
