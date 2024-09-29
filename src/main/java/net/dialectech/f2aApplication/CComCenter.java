@@ -111,20 +111,20 @@ public class CComCenter {
 
 	private CComCenter() {
 		rigsAddress = new LinkedHashMap<String, Integer>();
-		rigsAddress.put("IC-9700", 0xA2);
-		rigsAddress.put("ID-52", 0xA6);
+		rigsAddress.put("IC-9700（Hz）", 0xA2);
+		rigsAddress.put("ID-52（Hz）", 0xA6);
 
 		frequencyMap = new LinkedHashMap<String, Integer>();
-		frequencyMap.put("安全・安定感UP",174 );
-		frequencyMap.put("催淫・陶酔効果",256 );
-		frequencyMap.put("細胞組織再生促進・記憶力UP",285 );
-		frequencyMap.put("恐怖からの解放",396 );
-		frequencyMap.put("変化・転換促進、マイナス思考からの解放",417 );
-		frequencyMap.put("DNA修復・精神啓発",528 );
-		frequencyMap.put("人間関係の向上",639 );
-		frequencyMap.put("直感力・想像力UP",741 );
-		frequencyMap.put("松果体の活性・霊性UP",852 );
-		frequencyMap.put("宇宙と結合",963 );
+		frequencyMap.put("安全・安定感UP（174 Hz）",174 );
+		frequencyMap.put("催淫・陶酔効果（256 Hz）",256 );
+		frequencyMap.put("細胞組織再生促進・記憶力UP（285 Hz）",285 );
+		frequencyMap.put("恐怖からの解放（396 Hz）",396 );
+		frequencyMap.put("変化・転換促進、マイナス思考からの解放（417 Hz）",417 );
+		frequencyMap.put("DNA修復・精神啓発（528 Hz）",528 );
+		frequencyMap.put("人間関係の向上（639 Hz）",639 );
+		frequencyMap.put("直感力・想像力UP（741 Hz）",741 );
+		frequencyMap.put("松果体の活性・霊性UP（852 Hz）",852 );
+		frequencyMap.put("宇宙と結合（963 Hz）",963 );
 		frequencyMap.put("10Hz毎",-1 );
 		
 		rigList = new LinkedList<String>();
