@@ -70,6 +70,9 @@ public class CUIController {
 	@FXML
 	public ChoiceBox<String> dbTransmitterDestination;
 
+    @FXML
+    private ChoiceBox<String> dbToneEffectSelection;
+    
 	@FXML
 	private Label idStatusMessage;
 
@@ -87,31 +90,6 @@ public class CUIController {
 
 	@FXML
 	private Label lblToneFrequency;
-
-	@FXML
-	void onSettlementChanged(MouseEvent event) {
-		System.out.print("*");
-	}
-
-	@FXML
-	void onKeyPressed(KeyEvent event) {
-		comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_PRESSED);
-	}
-
-	@FXML
-	void onKeyReleased(KeyEvent event) {
-		comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_RELEASED);
-	}
-
-	@FXML
-	void onBtnSendReceiveClicked(MouseEvent event) {
-		if (comCenter.isPtt()) {
-			comCenter.setPtt(false);
-		} else {
-			comCenter.setPtt(true);
-		}
-		dispSendReceive();
-	}
 
 	public void dispSendReceive() {
 		if (dbComPort4Rig.getValue() == null) {
@@ -231,6 +209,12 @@ public class CUIController {
 			comCenter.reOpenAllDevices(newData, dbAudioPort.getValue(), sbAtackDelay.getValue(),
 					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
 		});
+		dbToneEffectSelection.valueProperty().addListener((ov, old_val, new_Val) -> {
+			comCenter.setToneEffect(new_Val);
+			int newData = presentSpecifiedFrequency();
+			comCenter.reOpenAllDevices(newData, dbAudioPort.getValue(), sbAtackDelay.getValue(),
+					sbReleaseDelay.getValue(), sbAfVolume.getValue(), sbMonitorVolume.getValue());
+		});
 
 		sbAfVolume.setMax(100.0);
 		sbAfVolume.setMin(0.0);
@@ -254,16 +238,37 @@ public class CUIController {
 
 		dbAudioPort.getItems().addAll(comCenter.getAudioDeviceNameList());
 
-		SerialPort[] ports = SerialPort.getCommPorts();
-		LinkedList<String> comPortList = new LinkedList<String>();
-		for (SerialPort port : ports) {
-			// COMポートの名前を表示
-			comPortList.add(port.getSystemPortName());
-		}
-		dbComPort4Rig.getItems().addAll(comPortList);
-		dbComPort4KeyCDC.getItems().addAll(comPortList);
+
+		dbComPort4Rig.getItems().addAll(comCenter.getComPortList());
+		dbComPort4KeyCDC.getItems().addAll(comCenter.getComPortList());
 		dbPrimaryToneSelection.getItems().addAll(comCenter.getFrequencyNameList());
+		dbToneEffectSelection.getItems().addAll(comCenter.getToneEffectList());
 		dbTransmitterDestination.getItems().addAll(comCenter.getRigList());
+	}
+
+	@FXML
+	void onBtnSendReceiveClicked(MouseEvent event) {
+		if (comCenter.isPtt()) {
+			comCenter.setPtt(false);
+		} else {
+			comCenter.setPtt(true);
+		}
+		dispSendReceive();
+	}
+
+	@FXML
+	void onKeyPressed(KeyEvent event) {
+		comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_PRESSED);
+	}
+
+	@FXML
+	void onKeyReleased(KeyEvent event) {
+		comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_RELEASED);
+	}
+
+	@FXML
+	void onSettlementChanged(MouseEvent event) {
+		System.out.print("*");
 	}
 
 	public int presentSpecifiedFrequency() {
@@ -282,20 +287,24 @@ public class CUIController {
 		return res ;
 	}
 	
-	public String selectedComPort4Rig() {
-		return dbComPort4Rig.getValue();
+	public String selectedAudioChannel() {
+		return dbAudioPort.getValue();
 	}
 
 	public String selectedComPort4KeyCDC() {
 		return dbComPort4KeyCDC.getValue();
 	}
 
-	public String selectedAudioChannel() {
-		return dbAudioPort.getValue();
+	public String selectedComPort4Rig() {
+		return dbComPort4Rig.getValue();
 	}
-
+	
 	public String selectedRig() {
 		return dbTransmitterDestination.getValue();
+	}
+
+	public String selectedToneEffect() {
+		return dbToneEffectSelection.getValue();
 	}
 
 }

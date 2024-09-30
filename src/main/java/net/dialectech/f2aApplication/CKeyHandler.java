@@ -57,7 +57,10 @@ public class CKeyHandler extends Service<String> {
 	public void reOpen(String keyPort) {
 		if (sp!=null) 
 			sp.closePort();
-		sp = SerialPort.getCommPort(keyPort);
+		if (keyPort==null)
+			return ;
+		String[] keyPortCore = keyPort.split(":");
+		sp = SerialPort.getCommPort(keyPortCore[0]);
 		sp.setBaudRate(19200);
 		sp.setNumDataBits(8);
 		

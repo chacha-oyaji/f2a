@@ -142,17 +142,21 @@ public class CSendReceiveController extends Service<String> {
 	void sendCI_V_Command(int com, int comSub, int operand, String message) {
 		CComCenter commMem = CComCenter.getInstance();
 		String comPort = controller.selectedComPort4Rig();
-		System.out.println("COM: " + comPort + " : " + message);
-		if (comPort == null) {
+		if (comPort==null)
+			return ;
+		String[] keyPortCore = comPort.split(":");
+
+		if (keyPortCore[0] == null) {
 			System.out.println("PTT Com Port is not selected.");
 			return;
 		}
+		System.out.println("COM: " + keyPortCore[0] + ": " + message);
 		if (controller.selectedRig() == null) {
 			System.out.println("Rig is not selected.");
 			return;
 
 		}
-		SerialPort sp = SerialPort.getCommPort(comPort);
+		SerialPort sp = SerialPort.getCommPort(keyPortCore[0]);
 		sp.setBaudRate(19200);
 		sp.setNumDataBits(8);
 

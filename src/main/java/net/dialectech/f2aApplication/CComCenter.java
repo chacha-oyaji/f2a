@@ -1,5 +1,6 @@
 package net.dialectech.f2aApplication;
 
+import java.lang.ModuleLayer.Controller;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -9,12 +10,17 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Line;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Mixer.Info;
+
+import com.fazecast.jSerialComm.SerialPort;
+
 import javafx.application.Platform;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * CComMemoryは、UIスレッドとWorkerスレッドとの通信用オブジェクト。Singletonとして利用することにした。
+ * CComCenterは、UIスレッドとWorkerスレッドとの通信用オブジェクト。Singletonとして利用することにした。
+ * また、情報も集中的に取り扱うことになっている。
+ * 
  */
 public class CComCenter {
 
@@ -70,6 +76,10 @@ public class CComCenter {
 	LinkedList<String> rigList;
 	@Getter
 	LinkedHashMap<String, Integer> frequencyMap ;
+	@Getter
+	LinkedList<String> toneEffectList;
+	@Getter
+	LinkedList<String> comPortList ;
 	
 	@Getter
 	Info[] mixerInfos;
@@ -83,7 +93,10 @@ public class CComCenter {
 	@Getter
 	@Setter
 	private double micVolume;
-
+	@Getter
+	@Setter
+	private String toneEffect;
+	
 	@Getter
 	@Setter
 	private long releaseDelay;
@@ -116,7 +129,7 @@ public class CComCenter {
 
 		frequencyMap = new LinkedHashMap<String, Integer>();
 		frequencyMap.put("安全・安定感UP（174 Hz）",174 );
-		frequencyMap.put("催淫・陶酔効果（256 Hz）",256 );
+		frequencyMap.put("陶酔効果（256 Hz）",256 );
 		frequencyMap.put("細胞組織再生促進・記憶力UP（285 Hz）",285 );
 		frequencyMap.put("恐怖からの解放（396 Hz）",396 );
 		frequencyMap.put("変化・転換促進、マイナス思考からの解放（417 Hz）",417 );
@@ -125,13 +138,17 @@ public class CComCenter {
 		frequencyMap.put("直感力・想像力UP（741 Hz）",741 );
 		frequencyMap.put("松果体の活性・霊性UP（852 Hz）",852 );
 		frequencyMap.put("宇宙と結合（963 Hz）",963 );
-		frequencyMap.put("10Hz毎",-1 );
+		frequencyMap.put("10Hz毎",-1 );	// ここで「-1」が指定されると、CUIController中でスライドバーがenableになるように処理されるようになっている。
 		
 		rigList = new LinkedList<String>();
 		for (Entry<String, Integer> rig : rigsAddress.entrySet()) {
 			rigList.add(rig.getKey());
 		}
 
+		toneEffectList = new LinkedList<String>();
+		toneEffectList.add("NORMAL") ;
+		toneEffectList.add("ATACK TREBLE") ;
+		
 		// keyHistory reset
 		PointerOfTimeStamp = 0;
 		timeStamp[PointerOfTimeStamp] = 0;
@@ -149,6 +166,13 @@ public class CComCenter {
 			if (targetLineInfos.length > 0) {
 				mixerMap.put(mixerInfo.getName(), mixer);
 			}
+		}
+		
+		SerialPort[] ports = SerialPort.getCommPorts();
+		comPortList = new LinkedList<String>();
+		for (SerialPort port : ports) {
+			// COMポートの名前を表示
+			comPortList.add(port.getSystemPortName() + " :" + port.toString());
 		}
 	}
 
@@ -241,7 +265,7 @@ public class CComCenter {
 	public void addToneGenerator(CToneGenerator tg) {
 		toneGeneratorArray.add(tg);
 	}
-
+	
 	public CToneGenerator getToneGeneratorOf(int index) {
 		if (index >= toneGeneratorArray.size()) {
 			return null;
@@ -283,7 +307,7 @@ public class CComCenter {
 				tg.reOpenToneGenerator((int) frequency, monitorVolume, targetMixer);
 				break;
 			case INDEX_FOR_MIC_OUTPUT:
-				// index=1のものは、マイク投入用とする
+				// index=1のものは、リグのマイクに投入するためのオブジェクト
 				if (afPortName == null)
 					targetMixer = AudioSystem.getMixer(null); // 未設定の場合にはデフォルトを設定。
 				else
