@@ -5,47 +5,80 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.dialectech.f2aApplication.CUIController">
-   <center>
-		<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="680.0" BorderPane.alignment="CENTER">
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.dialectech.f2aApplication.CUIController">
+	<center>
+		<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="680.0" BorderPane.alignment="CENTER">
 			<children>
-				<ScrollBar fx:id="sbToneFrequency" layoutX="239.0" layoutY="169.0" prefHeight="20.0" prefWidth="300.0" />
-				<ScrollBar fx:id="sbReleaseDelay" layoutX="239.0" layoutY="97.0" prefHeight="20.0" prefWidth="300.0" />
-				<Label layoutX="22.0" layoutY="65.0" text="ATACK DELAY" />
-				<ScrollBar fx:id="sbAtackDelay" layoutX="240.0" layoutY="64.0" prefHeight="20.0" prefWidth="300.0" />
-				<Button fx:id="btnSendReceive" layoutX="14.0" layoutY="470.0" mnemonicParsing="false" onMouseClicked="#onBtnSendReceiveClicked" prefHeight="30.0" prefWidth="527.0" text="SEND/RECV" textFill="#3f30a1" />
-				<Label layoutX="22.0" layoutY="319.0" text="MIC SELECTION" />
-				<Label layoutX="22.0" layoutY="355.0" text="PTT PORT SELECTION" />
-				<Label layoutX="22.0" layoutY="98.0" text="RELEASE DELAY" />
-				<Label layoutX="22.0" layoutY="170.0" text="TONE FREQUENCY" />
-				<ScrollBar fx:id="sbAfVolume" layoutX="240.0" layoutY="246.0" prefHeight="20.0" prefWidth="300.0" />
-				<Label layoutX="22.0" layoutY="247.0" text="MIC OUTPUT VOLUME" />
-				<CheckBox fx:id="cbBreakIn" layoutX="26.0" layoutY="24.0" mnemonicParsing="false" text="BREAK-IN" />
-				<TextField id="txtWindow" layoutX="236.0" layoutY="429.0" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" prefHeight="25.0" prefWidth="301.0" />
-				<Label layoutX="22.0" layoutY="433.0" text="CURSOR HOLDER for KeyBoard" />
-				<ScrollBar fx:id="sbMonitorVolume" layoutX="240.0" layoutY="280.0" prefHeight="20.0" prefWidth="300.0" />
-				<Label layoutX="22.0" layoutY="281.0" text="AF MONITOR VOLUME" />
-            <ChoiceBox fx:id="dbAudioPort" layoutX="239.0" layoutY="315.0" prefHeight="25.0" prefWidth="297.0" />
-            <ChoiceBox fx:id="dbComPort4Rig" layoutX="239.0" layoutY="351.0" prefHeight="25.0" prefWidth="297.0" />
-            <Label fx:id="idStatusMessage" layoutX="232.0" layoutY="24.0" prefHeight="17.0" prefWidth="308.0" text="Message Here" />
-            <Label layoutX="18.0" layoutY="518.0" text="Transmitter Destination" />
-            <ChoiceBox fx:id="dbTransmitterDestination" layoutX="240.0" layoutY="514.0" prefHeight="25.0" prefWidth="302.0" />
-            <Label fx:id="lblAtackDelay" layoutX="579.0" layoutY="65.0" prefHeight="17.0" prefWidth="79.0" text="" />
-            <Label fx:id="lblReleaseDelay" layoutX="579.0" layoutY="99.0" prefHeight="17.0" prefWidth="79.0" text="" />
-            <Label fx:id="lblToneFrequency" layoutX="579.0" layoutY="132.0" prefHeight="17.0" prefWidth="79.0" text="label" />
-            <Label fx:id="lblMicOutputVolume" layoutX="579.0" layoutY="248.0" prefHeight="17.0" prefWidth="79.0" text="level" />
-            <Label fx:id="lblMonitorVolume" layoutX="579.0" layoutY="282.0" prefHeight="17.0" prefWidth="79.0" text="level" />
-            <Label layoutX="21.0" layoutY="395.0" text="KEY PORT SELECTION" />
-            <ChoiceBox fx:id="dbComPort4KeyCDC" layoutX="238.0" layoutY="391.0" prefHeight="25.0" prefWidth="297.0" />
-            <Label layoutX="21.0" layoutY="132.0" text="TONE FREQUENCY SELECTION" />
-            <ChoiceBox fx:id="dbPrimaryToneSelection" layoutX="238.0" layoutY="128.0" prefHeight="25.0" prefWidth="297.0" />
-            <Label layoutX="21.0" layoutY="206.0" text="TONE EFFECT SELECTION" />
-            <ChoiceBox fx:id="dbToneEffectSelection" layoutX="238.0" layoutY="202.0" prefHeight="25.0" prefWidth="297.0" />
+				<TabPane prefHeight="439.0" prefWidth="680.0" tabClosingPolicy="UNAVAILABLE">
+					<tabs>
+						<Tab text="OPERATION">
+							<content>
+								<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="568.0" prefWidth="680.0">
+									<children>
+										<ScrollBar fx:id="sbToneFrequency" layoutX="239.0" layoutY="169.0" prefHeight="20.0" prefWidth="300.0" />
+										<ScrollBar fx:id="sbReleaseDelay" layoutX="239.0" layoutY="97.0" prefHeight="20.0" prefWidth="300.0" />
+										<Label layoutX="22.0" layoutY="65.0" text="ATACK DELAY" />
+										<ScrollBar fx:id="sbAtackDelay" layoutX="240.0" layoutY="64.0" prefHeight="20.0" prefWidth="300.0" />
+										<Button fx:id="btnSendReceive" layoutX="14.0" layoutY="356.0" mnemonicParsing="false" onMouseClicked="#onBtnSendReceiveClicked" prefHeight="30.0" prefWidth="527.0" text="SEND/RECV" textFill="#3f30a1" />
+										<Label layoutX="22.0" layoutY="98.0" text="RELEASE DELAY" />
+										<Label layoutX="22.0" layoutY="170.0" text="TONE FREQUENCY" />
+										<ScrollBar fx:id="sbAfVolume" layoutX="240.0" layoutY="246.0" prefHeight="20.0" prefWidth="300.0" />
+										<Label layoutX="22.0" layoutY="247.0" text="MIC OUTPUT VOLUME" />
+										<CheckBox fx:id="cbBreakIn" layoutX="26.0" layoutY="24.0" mnemonicParsing="false" text="BREAK-IN" />
+										<TextField id="txtWindow" layoutX="236.0" layoutY="315.0" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" prefHeight="25.0" prefWidth="301.0" />
+										<Label layoutX="22.0" layoutY="319.0" text="CURSOR HOLDER for KeyBoard" />
+										<ScrollBar fx:id="sbMonitorVolume" layoutX="240.0" layoutY="280.0" prefHeight="20.0" prefWidth="300.0" />
+										<Label layoutX="22.0" layoutY="281.0" text="AF MONITOR VOLUME" />
+										<Label fx:id="idStatusMessage" layoutX="232.0" layoutY="24.0" prefHeight="17.0" prefWidth="308.0" text="Message Here" />
+										<Label layoutX="20.0" layoutY="404.0" />
+										<Label fx:id="lblAtackDelay" layoutX="579.0" layoutY="65.0" prefHeight="17.0" prefWidth="79.0" text="" />
+										<Label fx:id="lblReleaseDelay" layoutX="579.0" layoutY="99.0" prefHeight="17.0" prefWidth="79.0" text="" />
+										<Label fx:id="lblToneFrequency" layoutX="579.0" layoutY="132.0" prefHeight="17.0" prefWidth="79.0" text="Freq" />
+										<Label fx:id="lblMicOutputVolume" layoutX="579.0" layoutY="248.0" prefHeight="17.0" prefWidth="79.0" text="level" />
+										<Label fx:id="lblMonitorVolume" layoutX="579.0" layoutY="282.0" prefHeight="17.0" prefWidth="79.0" text="level" />
+										<Label layoutX="21.0" layoutY="132.0" text="TONE FREQUENCY SELECTION" />
+										<ChoiceBox fx:id="dbPrimaryToneSelection" layoutX="238.0" layoutY="128.0" prefHeight="25.0" prefWidth="297.0" />
+										<Label layoutX="21.0" layoutY="206.0" text="TONE EFFECT SELECTION" />
+										<ChoiceBox fx:id="dbToneEffectSelection" layoutX="238.0" layoutY="202.0" prefHeight="25.0" prefWidth="297.0" />
+										<Label fx:id="lblAtackDelay" layoutX="579.0" layoutY="66.0" prefHeight="17.0" prefWidth="79.0" text="AtackDelay mS" />
+										<Label fx:id="lblReleaseDelay" layoutX="579.0" layoutY="99.0" prefHeight="17.0" prefWidth="79.0" text="Release Delay mS" />
+
+									</children>
+								</AnchorPane>
+							</content>
+						</Tab>
+						<Tab text="CONNECTION">
+							<content>
+								<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="182.0" prefWidth="680.0">
+
+									<children>
+										<Label layoutX="19.0" layoutY="18.0" text="MIC SELECTION" />
+										<Label layoutX="20.0" layoutY="96.0" text="PTT PORT SELECTION" />
+										<ChoiceBox fx:id="dbAudioPort" layoutX="236.0" layoutY="14.0" prefHeight="25.0" prefWidth="297.0" />
+										<ChoiceBox fx:id="dbComPort4Rig" layoutX="236.0" layoutY="92.0" prefHeight="25.0" prefWidth="297.0" />
+										<ChoiceBox fx:id="dbComPort4KeyCDC" layoutX="235.0" layoutY="132.0" prefHeight="25.0" prefWidth="297.0" />
+										<ChoiceBox fx:id="dbTransmitterDestination" layoutX="235.0" layoutY="169.0" prefHeight="25.0" prefWidth="297.0" />
+										<Label layoutX="18.0" layoutY="518.0" text="Transmitter Destination" />
+										<Label layoutX="18.0" layoutY="136.0" text="KEY PORT SELECTION" />
+										<Label layoutX="19.0" layoutY="173.0" text="RIG ID" />
+										<Label layoutX="19.0" layoutY="57.0" text="MONITOR SELECTION" />
+										<ChoiceBox fx:id="dbMonitorPort" layoutX="236.0" layoutY="53.0" prefHeight="25.0" prefWidth="297.0" />
+
+									</children>
+								</AnchorPane>
+
+							</content>
+						</Tab>
+					</tabs>
+				</TabPane>
+
 			</children>
 		</AnchorPane>
-   </center>
+	</center>
 </BorderPane>

@@ -124,8 +124,8 @@ public class CComCenter {
 
 	private CComCenter() {
 		rigsAddress = new LinkedHashMap<String, Integer>();
-		rigsAddress.put("IC-9700（Hz）", 0xA2);
-		rigsAddress.put("ID-52（Hz）", 0xA6);
+		rigsAddress.put("IC-9700", 0xA2);
+		rigsAddress.put("ID-52", 0xA6);
 
 		frequencyMap = new LinkedHashMap<String, Integer>();
 		frequencyMap.put("安全・安定感UP（174 Hz）",174 );
@@ -155,7 +155,6 @@ public class CComCenter {
 		keyStat[PointerOfTimeStamp] = EKeyStat.KeyNull;
 
 		mixerMap = new LinkedHashMap<String, Mixer>();
-		System.out.println("=== Output Devices ===");
 
 		mixerInfos = AudioSystem.getMixerInfo();
 		for (Mixer.Info mixerInfo : mixerInfos) {
@@ -292,7 +291,7 @@ public class CComCenter {
 		}
 	}
 
-	public void reOpenAllDevices(double frequency, String afPortName, double atackDelay, double releaseDelay,
+	public void reOpenAllDevices(double frequency, String monitorPortName, String afPortName, double atackDelay, double releaseDelay,
 			double micVolume, double monitorVolume) {
 		if (toneGeneratorArray == null)
 			return;
@@ -302,7 +301,14 @@ public class CComCenter {
 			switch (index) {
 			case INDEX_FOR_MONITOR:
 				// index=0のものは、モニター用
-				targetMixer = AudioSystem.getMixer(null); // モニターにはデフォルトを設定。
+				if (monitorPortName == null)
+					targetMixer = AudioSystem.getMixer(null); // 未設定の場合にはデフォルトを設定。
+				else
+					targetMixer = mixerMap.get(monitorPortName);
+
+				if (targetMixer == null) {
+					targetMixer = AudioSystem.getMixer(null); // 異常があればデフォルトを設定。
+				}
 				tg.closeToneGenerator();
 				tg.reOpenToneGenerator((int) frequency, monitorVolume, targetMixer);
 				break;
