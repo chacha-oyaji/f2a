@@ -12,8 +12,8 @@ public class CTGSupporter extends Task<String> {
 
 	private static final int BYTES_PER_WORD = 2;
 	final static long SYSTEM_DELAY_MS = 0;
-	final static int OUTER_BUFFER_SIZE = 64;
-	final static int SOUND_BLOCK_VOLUME = 50;
+	final static int OUTER_BUFFER_SIZE = 128;
+	final static int SOUND_BLOCK_VOLUME = 20;
 	
 	private AudioFormat af;
 	private SourceDataLine sdl;
