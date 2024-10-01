@@ -150,7 +150,7 @@ public class CTGSupporter extends Task<String> {
 		}
 
 		switch (comCenter.getToneEffect()) {
-		case "ATACK TREBLE":
+		case "CHAPPY":
 			fillSoundBufferWithAtackTreble(frequency, volume);
 			break;
 		case "NORMAL":

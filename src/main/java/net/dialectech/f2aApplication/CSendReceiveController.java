@@ -150,13 +150,15 @@ public class CSendReceiveController extends Service<String> {
 			System.out.println("PTT Com Port is not selected.");
 			return;
 		}
-		System.out.println("COM: " + keyPortCore[0] + ": " + message);
+		String portId = keyPortCore[0].trim();
+		
+		System.out.println("COM: " + portId + ": " + message);
 		if (controller.selectedRig() == null) {
 			System.out.println("Rig is not selected.");
 			return;
 
 		}
-		SerialPort sp = SerialPort.getCommPort(keyPortCore[0]);
+		SerialPort sp = SerialPort.getCommPort(portId);
 		sp.setBaudRate(19200);
 		sp.setNumDataBits(8);
 

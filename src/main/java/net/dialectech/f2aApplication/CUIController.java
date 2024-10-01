@@ -1,7 +1,6 @@
 package net.dialectech.f2aApplication;
 
 import java.net.URL;
-import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 import javax.sound.sampled.AudioSystem;
@@ -16,8 +15,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import lombok.Getter;
 import lombok.Setter;
-
-import com.fazecast.jSerialComm.SerialPort;
 
 public class CUIController {
 
