@@ -314,10 +314,6 @@ public class CUIController {
 		return dbComPort4Rig.getValue();
 	}
 
-	public String selectedRig() {
-		return dbTransmitterDestination.getValue();
-	}
-
 	public String selectedMonitorPort() {
 		return dbMonitorPort.getValue();
 	}
@@ -325,11 +321,19 @@ public class CUIController {
 	public String selectedPrimaryToneSelection() {
 		return dbPrimaryToneSelection.getValue();
 	}
+
+	public String selectedRig() {
+		return dbTransmitterDestination.getValue();
+	}
 	
 	public String selectedToneEffectSelection() {
 		return dbToneEffectSelection.getValue();
 	}
 	//
+
+	public void setSelectedAtackDelay(double data) {
+		sbAtackDelay.setValue(data);
+	}
 
 	public void setSelectedAudioChannel(String data) {
 		dbAudioPort.setValue(data);
@@ -343,24 +347,20 @@ public class CUIController {
 		dbComPort4Rig.setValue(data);
 	}
 
-	public void setSelectedRig(String data) {
-		dbTransmitterDestination.setValue(data);
-	}
-
-	public void setSelectedAtackDelay(double data) {
-		sbAtackDelay.setValue(data);
-	}
-
 	public void setSelectedMonitorPort(String data) {
 		dbMonitorPort.setValue(data);
-	}
-	
-	public void setSelectedToneEffectSelection(String data) {
-		dbToneEffectSelection.setValue(data);
 	}
 
 	public void setSelectedPrimaryToneSelection(String data) {
 		dbPrimaryToneSelection.setValue(data);
+	}
+	
+	public void setSelectedRig(String data) {
+		dbTransmitterDestination.setValue(data);
+	}
+
+	public void setSelectedToneEffectSelection(String data) {
+		dbToneEffectSelection.setValue(data);
 	}
 	
 
