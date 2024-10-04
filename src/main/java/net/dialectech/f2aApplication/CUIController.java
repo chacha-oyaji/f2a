@@ -289,7 +289,7 @@ public class CUIController {
 
 	public int presentSpecifiedFrequency() {
 		int res;
-		if (dbPrimaryToneSelection.getValue() == null)
+		if (dbPrimaryToneSelection.getValue() == null || dbPrimaryToneSelection.getValue().equals(""))
 			res = -1;
 		else
 			res = comCenter.frequencyMap.get(dbPrimaryToneSelection.getValue());

@@ -6,9 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileTime;
+import java.util.Objects;
 import java.util.Properties;
-
-import org.apache.commons.io.FileUtils;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -121,7 +125,7 @@ public class Main extends Application {
 				String propertyFileName4Output = System.getProperty("user.home") + File.separator + "." + System.getProperty("user.name") + File.separator + "f2A.properties" ;
 				try {
 					// Fileがなかったのときのことを考慮して、touchしておく。
-					FileUtils.touch(new File(propertyFileName4Output)) ;
+					touch(Objects.requireNonNull(new File(propertyFileName4Output), "file").toPath()) ;
 					
 					try (OutputStream fs = new FileOutputStream(propertyFileName);){
 						String data = controller.selectedComPort4KeyCDC();
@@ -160,4 +164,37 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	
+	//以下は、FileUtilsのうち必要部分だけを抽出。
+    private static Path getParent(final Path path) {
+        return path == null ? null : path.getParent();
+    }
+
+    private static Path readIfSymbolicLink(final Path path) throws IOException {
+        return path != null ? Files.isSymbolicLink(path) ? Files.readSymbolicLink(path) : path : null;
+    }
+
+    public static Path createParentDirectories(final Path path, final LinkOption linkOption, final FileAttribute<?>... attrs) throws IOException {
+        Path parent = getParent(path);
+        parent = linkOption == LinkOption.NOFOLLOW_LINKS ? parent : readIfSymbolicLink(parent);
+        if (parent == null) {
+            return null;
+        }
+        final boolean exists = linkOption == null ? Files.exists(parent) : Files.exists(parent, linkOption);
+        return exists ? parent : Files.createDirectories(parent, attrs);
+    }
+    
+    public static Path touch(final Path file) throws IOException {
+        Objects.requireNonNull(file, "file");
+        if (!Files.exists(file)) {
+            createParentDirectories(file, LinkOption.NOFOLLOW_LINKS);
+            Files.createFile(file);
+        } else {
+            Files.setLastModifiedTime(file, FileTime.fromMillis(System.currentTimeMillis()));
+        }
+        return file;
+    }
+
+    
 }
