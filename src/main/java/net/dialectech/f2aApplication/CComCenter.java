@@ -148,6 +148,7 @@ public class CComCenter {
 		toneEffectList = new LinkedList<String>();
 		toneEffectList.add("NORMAL") ;
 		toneEffectList.add("CHAPPY") ;
+		toneEffectList.add("CURVED_ATACK") ;		
 		
 		// keyHistory reset
 		PointerOfTimeStamp = 0;

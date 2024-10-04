@@ -14,7 +14,7 @@ public class CTGSupporter extends Task<String> {
 	final static long SYSTEM_DELAY_MS = 0;
 	final static int OUTER_BUFFER_SIZE = 128;
 	final static int SOUND_BLOCK_VOLUME = 20;
-	
+
 	private AudioFormat af;
 	private SourceDataLine sdl;
 	protected CComCenter comCenter = CComCenter.getInstance();
@@ -59,12 +59,14 @@ public class CTGSupporter extends Task<String> {
 							formerStatus = presentKeyStat;
 							if (sdl.available() > maxAvailableVol) {
 								sdl.write(byteBufferToneOn[stepIndex], 0, byteBufferToneOn[stepIndex].length);
-								if (stepIndex < OUTER_BUFFER_SIZE - 1)
+								if (stepIndex < OUTER_BUFFER_SIZE - 1) {
 									stepIndex++;
+								}
 							}
 						} else {
 							formerStatus = presentKeyStat;
 							// sdl.write(byteBufferToneOff, 0, byteBufferToneOff.length);
+							stepIndex = 0;
 						}
 						if (Thread.currentThread().isInterrupted()) {
 							break;
@@ -146,12 +148,15 @@ public class CTGSupporter extends Task<String> {
 	public void fillSoundBuffer(int frequency, double volume) {
 		if (comCenter.getToneEffect() == null) {
 			fillSoundBufferNormal(frequency, volume);
-			return ;
+			return;
 		}
 
 		switch (comCenter.getToneEffect()) {
 		case "CHAPPY":
-			fillSoundBufferWithAtackTreble(frequency, volume);
+			fillSoundBufferWithChappy(frequency, volume);
+			break;
+		case "CURVED_ATACK":
+			fillSoundBufferWithCurvedAtack(frequency, volume);
 			break;
 		case "NORMAL":
 		default:
@@ -160,7 +165,7 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
-	public void fillSoundBufferWithAtackTreble(int frequency, double volume) {
+	public void fillSoundBufferWithChappy(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
@@ -183,15 +188,41 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
+	public void fillSoundBufferWithCurvedAtack(int frequency, double volume) {
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
+		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		short pointData = 0;
+		// 波形を生成
+		for (int outerIndex = 0; outerIndex < 2; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+				double angle = 2.0 * Math.PI * i / bufferSize;
+				double amplify = (double) (i + bufferSize * SOUND_BLOCK_VOLUME * outerIndex)
+						/ (((double) 2) * bufferSize * SOUND_BLOCK_VOLUME);
+				pointData = (short) (Math.sin(angle) * 32767.0 * amplify * volume / 100.0);
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
+		}
+		for (int outerIndex = 2; outerIndex < OUTER_BUFFER_SIZE; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+				double angle = 2.0 * Math.PI * i / bufferSize;
+				pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
+		}
+	}
+
 	public void fillSoundBufferNormal(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
-		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE ; ++outerIndex) {
+		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE; ++outerIndex) {
 			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
-				double angle =  2.0 * Math.PI * i / bufferSize;
+				double angle = 2.0 * Math.PI * i / bufferSize;
 				pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
 				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
 				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
