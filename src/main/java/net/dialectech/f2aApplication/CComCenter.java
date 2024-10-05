@@ -120,7 +120,11 @@ public class CComCenter {
 	@Setter
 	long timer;
 
-	public final int SAMPLE_RATE = 44100; // サンプリングレート
+	public final static int SAMPLE_RATE = 44100; // サンプリングレート
+	public final static String TONE_EFFECT_NORMAL = "NORMAL" ;
+	public final static String TONE_EFFECT_CHAPPY = "CHAPPY" ;
+	public final static String TONE_EFFECT_GRADUALLY_ATACK = "GRADUAL_ATACK" ;
+
 
 	private CComCenter() {
 		rigsAddress = new LinkedHashMap<String, Integer>();
@@ -146,9 +150,9 @@ public class CComCenter {
 		}
 
 		toneEffectList = new LinkedList<String>();
-		toneEffectList.add("NORMAL") ;
-		toneEffectList.add("CHAPPY") ;
-		toneEffectList.add("CURVED_ATACK") ;		
+		toneEffectList.add(TONE_EFFECT_NORMAL) ;
+		toneEffectList.add(TONE_EFFECT_CHAPPY) ;
+		toneEffectList.add(TONE_EFFECT_GRADUALLY_ATACK) ;	
 		
 		// keyHistory reset
 		PointerOfTimeStamp = 0;

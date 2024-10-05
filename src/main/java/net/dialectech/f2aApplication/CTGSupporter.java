@@ -152,13 +152,13 @@ public class CTGSupporter extends Task<String> {
 		}
 
 		switch (comCenter.getToneEffect()) {
-		case "CHAPPY":
+		case CComCenter.TONE_EFFECT_CHAPPY:
 			fillSoundBufferWithChappy(frequency, volume);
 			break;
-		case "CURVED_ATACK":
+		case CComCenter.TONE_EFFECT_GRADUALLY_ATACK:
 			fillSoundBufferWithCurvedAtack(frequency, volume);
 			break;
-		case "NORMAL":
+		case CComCenter.TONE_EFFECT_NORMAL:
 		default:
 			fillSoundBufferNormal(frequency, volume);
 			break;

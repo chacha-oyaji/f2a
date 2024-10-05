@@ -112,6 +112,14 @@ public class Main extends Application {
 				
 				if (prop.getProperty("atackDelay") != "")
 					controller.setSelectedAtackDelay(Double.parseDouble(prop.getProperty("atackDelay"))) ;
+				if (prop.getProperty("releaseDelay") != "")
+					controller.setSelectedReleaseDelay(Double.parseDouble(prop.getProperty("releaseDelay"))) ;
+				if (prop.getProperty("monitorVolume") != "")
+					controller.setSelectedMonitorVolume(Double.parseDouble(prop.getProperty("monitorVolume"))) ;
+				if (prop.getProperty("micVolume") != "")
+					controller.setSelectedMicVolume(Double.parseDouble(prop.getProperty("micVolume"))) ;
+				if (prop.getProperty("toneFrequency") != "")
+					controller.setSelectedFreeToneFrequency(Double.parseDouble(prop.getProperty("toneFrequency"))) ;
 			}
 			catch (Exception e) {
 				
@@ -135,6 +143,10 @@ public class Main extends Application {
 						props.setProperty("selectedRig",rejectNull(controller.selectedRig())) ;
 						props.setProperty("selectedToneEffectSelection",rejectNull(controller.selectedToneEffectSelection())) ;
 						props.setProperty("atackDelay",String.valueOf(controller.sbAtackDelay.getValue())) ;
+						props.setProperty("releaseDelay",String.valueOf(controller.sbReleaseDelay.getValue())) ;
+						props.setProperty("monitorVolume",String.valueOf(controller.sbMonitorVolume.getValue())) ;
+						props.setProperty("micVolume",String.valueOf(controller.sbMicVolume.getValue())) ;
+						props.setProperty("toneFrequency",String.valueOf(controller.sbToneFrequency.getValue())) ;
 						props.setProperty("selectedMonitorPort", rejectNull(controller.selectedMonitorPort()));
 						props.setProperty("selectedPrimaryToneSelection",rejectNull(controller.selectedPrimaryToneSelection())) ;
 						props.storeToXML(fs, "F2A Generator properties");
