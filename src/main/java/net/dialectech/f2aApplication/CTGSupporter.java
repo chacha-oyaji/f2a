@@ -155,6 +155,9 @@ public class CTGSupporter extends Task<String> {
 		case CComCenter.TONE_EFFECT_CHAPPY:
 			fillSoundBufferWithChappy(frequency, volume);
 			break;
+		case CComCenter.TONE_EFFECT_CHAPPY_2:
+			fillSoundBufferWithChappyUpper2Lower(frequency, volume);
+			break;
 		case CComCenter.TONE_EFFECT_GRADUALLY_ATACK:
 			fillSoundBufferWithCurvedAtack(frequency, volume);
 			break;
@@ -165,8 +168,31 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
+	private void fillSoundBufferWithChappyUpper2Lower(int frequency, double volume) {
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ
+		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		short pointData;
+		// 波形を生成
+		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE - 1; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+				double angle; // = 2.0 * Math.PI * i / bufferSize ;
+				angle = slipAngleUpper2Lower(outerIndex * SOUND_BLOCK_VOLUME, i, bufferSize);
+				pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
+		}
+		for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+			double angle = 2.0 * Math.PI * i / bufferSize;
+			pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
+			byteBufferToneOn[OUTER_BUFFER_SIZE - 1][index++] = (byte) ((pointData >> 8) & 0xff);
+			byteBufferToneOn[OUTER_BUFFER_SIZE - 1][index++] = (byte) (pointData & 0xff);
+		}
+	}
+
 	public void fillSoundBufferWithChappy(int frequency, double volume) {
-		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
@@ -233,6 +259,14 @@ public class CTGSupporter extends Task<String> {
 	private double slipAngle(double outerOffset, double innerIndex, double bufferSize) {
 		double baseAngular = outerOffset + innerIndex / bufferSize;
 		double innerAngular = baseAngular + baseAngular * (0.7 / Math.exp(baseAngular / bufferSize / 2.0));
+		double angle = 2.0 * Math.PI * innerAngular;
+		return angle;
+	}
+
+	private double slipAngleUpper2Lower(double outerOffset, double innerIndex, double bufferSize) {
+		double baseAngular = outerOffset + innerIndex / bufferSize;
+		double innerAngular = baseAngular
+				+ baseAngular * (1.0 / (1.0 + 2.0 / Math.exp(baseAngular / bufferSize / 2.0)));
 		double angle = 2.0 * Math.PI * innerAngular;
 		return angle;
 	}

@@ -32,7 +32,7 @@ public class CSendReceiveController extends Service<String> {
 
 	@Override
 	protected Task<String> createTask() {
-		// TODO 自動生成されたメソッド・スタブ
+
 		return new Task<String>() {
 
 			@Override
@@ -142,23 +142,8 @@ public class CSendReceiveController extends Service<String> {
 	void sendCI_V_Command(int com, int comSub, int operand, String message) {
 		CComCenter commMem = CComCenter.getInstance();
 		String comPort = controller.selectedComPort4Rig();
-		if (comPort==null)
-			return ;
-		String[] keyPortCore = comPort.split(":");
-
-		if (keyPortCore[0] == null) {
-			System.out.println("PTT Com Port is not selected.");
-			return;
-		}
-		String portId = keyPortCore[0].trim();
+		SerialPort sp = getPresentSerialPort(message,comPort);
 		
-		System.out.println("COM: " + portId + ": " + message);
-		if (controller.selectedRig() == null) {
-			System.out.println("Rig is not selected.");
-			return;
-
-		}
-		SerialPort sp = SerialPort.getCommPort(portId);
 		sp.setBaudRate(19200);
 		sp.setNumDataBits(8);
 
@@ -176,6 +161,28 @@ public class CSendReceiveController extends Service<String> {
 		sp.closePort();
 	}
 
+	private SerialPort getPresentSerialPort(String message,String comPort) {
+
+		if (comPort==null)
+			return null;
+		String[] keyPortCore = comPort.split(":");
+
+		if (keyPortCore[0] == null) {
+			System.out.println("PTT Com Port is not selected.");
+			return null;
+		}
+		String portId = keyPortCore[0].trim();
+		
+		System.out.println("COM: " + portId + ": " + message);
+		if (controller.selectedRig() == null) {
+			System.out.println("Rig is not selected.");
+			return null;
+
+		}
+		SerialPort sp = SerialPort.getCommPort(portId);
+		return sp ;
+	}
+	
 	private byte[] readDataTypeA(SerialPort sp) {
 		byte[] data = new byte[2];
 		byte[] result = new byte[128];
