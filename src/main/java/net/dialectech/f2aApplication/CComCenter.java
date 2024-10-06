@@ -128,10 +128,56 @@ public class CComCenter {
 
 
 	private CComCenter() {
+		// リグ～CI-V対応表は、こちら。Special Thanks to https://blog.goo.ne.jp/baristas_latte/e/7c35aefd68faaa0f54e73b0e4024749b
 		rigsAddress = new LinkedHashMap<String, Integer>();
+		rigsAddress.put("IC-271", 0x20);
+		rigsAddress.put("IC-275", 0x10);
+		rigsAddress.put("IC-371", 0x22);
+		rigsAddress.put("IC-375", 0x14);
+		rigsAddress.put("IC-575", 0x16);
+		rigsAddress.put("IC-7000", 0x70);
+		rigsAddress.put("IC-703", 0x68);
+		rigsAddress.put("IC-705", 0xA4);
+		rigsAddress.put("IC-706", 0x48);
+		rigsAddress.put("IC-706MKII", 0x4E);
+		rigsAddress.put("IC-706MKIIG", 0x58);
+		rigsAddress.put("IC-7100", 0x88);
+		rigsAddress.put("IC-7200", 0x76);
+		rigsAddress.put("IC-721", 0x28);
+		rigsAddress.put("IC-726", 0x30);
+		rigsAddress.put("IC-723", 0x38);
+		rigsAddress.put("IC-729", 0x3A);
+		rigsAddress.put("IC-731", 0x4);
+		rigsAddress.put("IC-736", 0x40);
+		rigsAddress.put("IC-732", 0x3C);
+		rigsAddress.put("IC-7300", 0x94);
+		rigsAddress.put("IC-7400", 0x66);
+		rigsAddress.put("IC-7410", 0x80);
+		rigsAddress.put("IC-746", 0x56);
+		rigsAddress.put("IC-750/750A", 0x1C);
+		rigsAddress.put("IC-756", 0x50);
+		rigsAddress.put("IC-756PRO", 0x5C);
+		rigsAddress.put("IC-756PROII", 0x64);
+		rigsAddress.put("IC-756PROIII", 0x6E);
+		rigsAddress.put("IC-760", 0x1E);
+		rigsAddress.put("IC-760PRO", 0x2C);
+		rigsAddress.put("IC-775", 0x46);
+		rigsAddress.put("IC-7600", 0x7A);
+		rigsAddress.put("IC-7610", 0x98);
+		rigsAddress.put("IC-7700", 0x74);
+		rigsAddress.put("IC-7800", 0x6A);
+		rigsAddress.put("IC-7850/7851", 0x8E);
+		rigsAddress.put("IC-780", 0x26);
+		rigsAddress.put("IC-820", 0x42);
+		rigsAddress.put("IC-821", 0x4C);
+		rigsAddress.put("IC-910", 0x60);
+		rigsAddress.put("IC-911", 0x60);
+		rigsAddress.put("IC-9100", 0x7C);
+		rigsAddress.put("IC-970", 0x2E);
 		rigsAddress.put("IC-9700", 0xA2);
+		rigsAddress.put("IC-1271", 0x24);
 		rigsAddress.put("ID-52", 0xA6);
-
+		
 		frequencyMap = new LinkedHashMap<String, Integer>();
 		frequencyMap.put("安全・安定感UP（174 Hz）",174 );
 		frequencyMap.put("陶酔効果（256 Hz）",256 );
