@@ -265,8 +265,7 @@ public class CTGSupporter extends Task<String> {
 
 	private double slipAngleUpper2Lower(double outerOffset, double innerIndex, double bufferSize) {
 		double baseAngular = outerOffset + innerIndex / bufferSize;
-		double innerAngular = baseAngular
-				+ baseAngular * (1.0 / (1.0 + 2.0 / Math.exp(baseAngular / bufferSize / 2.0)));
+		double innerAngular = baseAngular * (1.0 / (1.0 + 2.0 / Math.exp(baseAngular / bufferSize / 2.0)));
 		double angle = 2.0 * Math.PI * innerAngular;
 		return angle;
 	}
