@@ -152,11 +152,11 @@ public class CTGSupporter extends Task<String> {
 		}
 
 		switch (comCenter.getToneEffect()) {
-		case CComCenter.TONE_EFFECT_CHAPPY:
-			fillSoundBufferWithChappy(frequency, volume);
-			break;
-		case CComCenter.TONE_EFFECT_CHAPPY_2:
+		case CComCenter.TONE_EFFECT_CHAPPY_UPPER_TO_LOWER:
 			fillSoundBufferWithChappyUpper2Lower(frequency, volume);
+			break;
+		case CComCenter.TONE_EFFECT_CHAPPY_LOWER_TO_UPPER:
+			fillSoundBufferWithChappyLower2Upper(frequency, volume);
 			break;
 		case CComCenter.TONE_EFFECT_GRADUALLY_ATACK:
 			fillSoundBufferWithCurvedAtack(frequency, volume);
@@ -168,7 +168,7 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
-	private void fillSoundBufferWithChappyUpper2Lower(int frequency, double volume) {
+	private void fillSoundBufferWithChappyLower2Upper(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
@@ -191,7 +191,7 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
-	public void fillSoundBufferWithChappy(int frequency, double volume) {
+	public void fillSoundBufferWithChappyUpper2Lower(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ
 		int bufferSize = comCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。

@@ -122,8 +122,8 @@ public class CComCenter {
 
 	public final static int SAMPLE_RATE = 44100; // サンプリングレート
 	public final static String TONE_EFFECT_NORMAL = "NORMAL" ;
-	public final static String TONE_EFFECT_CHAPPY = "CHAPPY(H->L)" ;
-	public final static String TONE_EFFECT_CHAPPY_2 = "CHAPPY(L->H)" ;
+	public final static String TONE_EFFECT_CHAPPY_UPPER_TO_LOWER = "CHAPPY(H->L)" ;
+	public final static String TONE_EFFECT_CHAPPY_LOWER_TO_UPPER = "CHAPPY(L->H)" ;
 	public final static String TONE_EFFECT_GRADUALLY_ATACK = "GRADUAL_ATACK" ;
 
 
@@ -152,8 +152,8 @@ public class CComCenter {
 
 		toneEffectList = new LinkedList<String>();
 		toneEffectList.add(TONE_EFFECT_NORMAL) ;
-		toneEffectList.add(TONE_EFFECT_CHAPPY) ;
-		toneEffectList.add(TONE_EFFECT_CHAPPY_2) ;
+		toneEffectList.add(TONE_EFFECT_CHAPPY_UPPER_TO_LOWER) ;
+		toneEffectList.add(TONE_EFFECT_CHAPPY_LOWER_TO_UPPER) ;
 		toneEffectList.add(TONE_EFFECT_GRADUALLY_ATACK) ;	
 		
 		// keyHistory reset
