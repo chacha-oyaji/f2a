@@ -22,8 +22,7 @@ import javafx.fxml.FXMLLoader;
 
 public class Main extends Application {
 	static CUIController controller = null;
-	static CComCenter comCenter = CComCenter.getInstance();
-
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -135,6 +134,7 @@ public class Main extends Application {
 					// Fileがなかったのときのことを考慮して、touchしておく。
 					touch(Objects.requireNonNull(new File(propertyFileName4Output), "file").toPath()) ;
 					
+					// あとは、各設定パラメータを永続化。
 					try (OutputStream fs = new FileOutputStream(propertyFileName);){
 						String data = controller.selectedComPort4KeyCDC();
 						props.setProperty("selectedComPort4KeyCDC", rejectNull(data));
@@ -178,7 +178,7 @@ public class Main extends Application {
 	}
 	
 	
-	//以下は、FileUtilsのうち必要部分だけを抽出。
+	//以下、４つの関数は、FileUtilsのうちtouch()を利用するのに必要な部分だけを抽出したもの。もちろん、FileUtilsを引っ張り込んでも可。
     private static Path getParent(final Path path) {
         return path == null ? null : path.getParent();
     }
