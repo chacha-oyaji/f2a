@@ -1,6 +1,5 @@
 package net.dialectech.f2aApplication;
 
-import java.lang.ModuleLayer.Controller;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -125,6 +124,7 @@ public class CComCenter {
 	public final static String TONE_EFFECT_CHAPPY_UPPER_TO_LOWER = "CHAPPY(H->L)" ;
 	public final static String TONE_EFFECT_CHAPPY_LOWER_TO_UPPER = "CHAPPY(L->H)" ;
 	public final static String TONE_EFFECT_GRADUALLY_ATACK = "GRADUAL_ATACK" ;
+	public final static String TONE_EFFECT_WHITE_NOISE = "WHITE NOISE" ;
 
 
 	private CComCenter() {
@@ -201,6 +201,7 @@ public class CComCenter {
 		toneEffectList.add(TONE_EFFECT_CHAPPY_UPPER_TO_LOWER) ;
 		toneEffectList.add(TONE_EFFECT_CHAPPY_LOWER_TO_UPPER) ;
 		toneEffectList.add(TONE_EFFECT_GRADUALLY_ATACK) ;	
+		toneEffectList.add(TONE_EFFECT_WHITE_NOISE) ;	
 		
 		// keyHistory reset
 		PointerOfTimeStamp = 0;

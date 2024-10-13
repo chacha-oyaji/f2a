@@ -161,10 +161,29 @@ public class CTGSupporter extends Task<String> {
 		case CComCenter.TONE_EFFECT_GRADUALLY_ATACK:
 			fillSoundBufferWithCurvedAtack(frequency, volume);
 			break;
+		case CComCenter.TONE_EFFECT_WHITE_NOISE:
+			fillSoundBufferWithRandomNumber(frequency, volume);
+			break;
 		case CComCenter.TONE_EFFECT_NORMAL:
 		default:
 			fillSoundBufferNormal(frequency, volume);
 			break;
+		}
+	}
+
+
+	private void fillSoundBufferWithRandomNumber(int frequency, double volume) {
+		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		short pointData;
+		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE - 1; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+				double angle; // = 2.0 * Math.PI * i / bufferSize ;
+				angle = Math.random() * 65536.0;
+				pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
 		}
 	}
 
