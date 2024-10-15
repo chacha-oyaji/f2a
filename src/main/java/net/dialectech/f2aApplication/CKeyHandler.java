@@ -41,19 +41,18 @@ public class CKeyHandler extends Service<String> {
 					 * ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 					*/
 					/*
-	 					if (sp.getDSR()) {
-							if (formerMark==false) {
-								comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_PRESSED);
-								formerMark=true ;
-							}
+					 */
+					if (sp.getDSR()) {
+						if (formerMark == false) {
+							comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_PRESSED);
+							formerMark = true;
 						}
-						else {
-							if (formerMark==true) {
-								comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_RELEASED);
-								formerMark=false ;
-							}
+					} else {
+						if (formerMark == true) {
+							comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_RELEASED);
+							formerMark = false;
 						}
-					*/
+					}
 					int vol = sp.readBytes(buffer, 1);
 					if (vol != 0) {
 						switch (buffer[0]) {
