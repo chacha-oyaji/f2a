@@ -155,10 +155,6 @@ public class CUIController {
 
 		dbAudioPort.valueProperty().addListener((ov, old_val, new_Val) -> {
 			System.out.println("CHANGED TO " + new_Val);
-			String target = dbAudioPort.getValue();
-			Mixer mixer = comCenter.mixerMap.get(target);
-			if (mixer == null)
-				mixer = AudioSystem.getMixer(null);
 			comCenter.reOpenAllDevices(presentSpecifiedFrequency(), dbMonitorPort.getValue(), dbAudioPort.getValue(),
 					sbAtackDelay.getValue(), sbReleaseDelay.getValue(), sbMicVolume.getValue(),
 					sbMonitorVolume.getValue());
@@ -166,10 +162,6 @@ public class CUIController {
 
 		dbMonitorPort.valueProperty().addListener((ov, old_val, new_Val) -> {
 			System.out.println("CHANGED TO " + new_Val);
-			String target = dbMonitorPort.getValue();
-			Mixer mixer = comCenter.mixerMap.get(target);
-			if (mixer == null)
-				mixer = AudioSystem.getMixer(null);
 			comCenter.reOpenAllDevices(presentSpecifiedFrequency(), dbMonitorPort.getValue(), dbAudioPort.getValue(),
 					sbAtackDelay.getValue(), sbReleaseDelay.getValue(), sbMicVolume.getValue(),
 					sbMonitorVolume.getValue());
@@ -177,8 +169,6 @@ public class CUIController {
 
 		dbComPort4KeyCDC.valueProperty().addListener((ov, old_val, new_Val) -> {
 			System.out.println("KEY PORT is CHANGED TO " + new_Val);
-			String target = dbComPort4KeyCDC.getValue();
-
 			comCenter.reOpenKeyHandler(new_Val);
 		});
 

@@ -17,6 +17,7 @@ import java.util.Properties;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.fxml.FXMLLoader;
 
@@ -94,8 +95,12 @@ public class Main extends Application {
 				tg2.restart();
 			});
 			tg2.start();
+
 			/*
+			 * アイコン表示
 			*/
+			Image icon = new Image(this.getClass().getResourceAsStream("/net/dialectech/f2aApplication/BXMLAB.bmp"));
+			primaryStage.getIcons().add(icon);
 			Properties prop = new Properties();
 			String propertyFileName = System.getProperty("user.home") + File.separator + "." + System.getProperty("user.name") + File.separator + "f2A.properties" ;
 			System.out.println(propertyFileName);
