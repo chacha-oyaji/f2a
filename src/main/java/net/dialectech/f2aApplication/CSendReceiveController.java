@@ -54,10 +54,15 @@ public class CSendReceiveController extends Service<String> {
 						// Break-Inモードの場合の処理
 						long presentTime = System.currentTimeMillis();
 
+						/*
+						 * 本来であれば、次のブロックは、keyStatがKEY_RELEASEDのときに実行されるべきところなれど、
+						 * 機器の状況によって送信し続ける事故が起こったときにその状況から回避するために常にfinalReleaseTimeを
+						 * 把握しつつ、これを超えたときには「常に」RECEIVEの状況にすることとしている。
+						 */
 						if ((finalReleaseTime < presentTime) && sendOn) {
 							// Key off直後を検出
 							sendOn = false;
-							sendCI_V_Command(0x1c, 0x00, 0x00, "RECEIVE"); // 送信終了
+							sendCI_V_Command(0x1c, 0x00, 0x00, "RECEIVE by BREAK-IN"); // 送信終了
 							updateMessage("message for Receive");
 							comCenter.setPtt(false);
 							Platform.runLater(() -> {
@@ -78,20 +83,24 @@ public class CSendReceiveController extends Service<String> {
 							if ((eventTime < presentTime) && !sendOn) {
 								// Key on直後を検出
 								sendOn = true;
-								sendCI_V_Command(0x1c, 0x00, 0x01, "SEND"); // 送信開始
+								sendCI_V_Command(0x1c, 0x00, 0x01, "SEND by BREAK-IN"); // 送信開始
 								updateMessage("message for Send");
 								comCenter.setPtt(true);
 								Platform.runLater(() -> {
 									controller.dispSendReceive();
 								});
 							}
-							if (sendOn)
+							if (sendOn) {
 								incrementPointer2ReadTiming();
-							finalReleaseTime = eventTime + releaseDelayTime;
+							}
+							finalReleaseTime = eventTime + releaseDelayTime + 10000L;	//　連続送信は最大１０秒まで可能
 							break;
 						case KEY_RELEASED:
+							//　KEY_RELEASEDのときには特にここでRIGに受信命令を送らなくとも、第６２行付近で送っているので、特に何もする必要はない。
+							// finalReleaseTimeを設定しなおしただけで足りる。
 							finalReleaseTime = eventTime + releaseDelayTime;
 							incrementPointer2ReadTiming();
+							break ;
 						default:
 							finalReleaseTime = eventTime + releaseDelayTime;
 							break;
@@ -100,16 +109,16 @@ public class CSendReceiveController extends Service<String> {
 						// PTTモードの場合の処理
 						if (!comCenter.isBreakInMode()) {
 							if (comCenter.isPtt() && !formerPtt) {
-								sendCI_V_Command(0x1c, 0x00, 0x01, "SEND"); // 送信開始
-								updateMessage("message for Send");
+								sendCI_V_Command(0x1c, 0x00, 0x01, "SEND by PTT"); // 送信開始
+								updateMessage("message for Send by PTT");
 								Platform.runLater(() -> {
 									controller.dispSendReceive();
 								});
 								formerPtt = true;
 							}
 							if (!comCenter.isPtt() && formerPtt) {
-								sendCI_V_Command(0x1c, 0x00, 0x00, "RECEIVE"); // 送信終了
-								updateMessage("message for Receive");
+								sendCI_V_Command(0x1c, 0x00, 0x00, "RECEIVE by PTT"); // 送信終了
+								updateMessage("message for Receive by PTT");
 								Platform.runLater(() -> {
 									controller.dispSendReceive();
 								});
@@ -142,7 +151,7 @@ public class CSendReceiveController extends Service<String> {
 	void sendCI_V_Command(int com, int comSub, int operand, String message) {
 		CComCenter commMem = CComCenter.getInstance();
 		String comPort = controller.selectedComPort4Rig();
-		SerialPort sp = getPresentSerialPort(message,comPort);
+		SerialPort sp = getPresentSerialPort(null,comPort);
 		
 		sp.setBaudRate(19200);
 		sp.setNumDataBits(8);
@@ -158,6 +167,7 @@ public class CSendReceiveController extends Service<String> {
 			sendByte(sp, operand);
 		sendByte(sp, 0xfd);
 		// byte[] returnData = readDataTypeA(sp);
+		System.out.println(message);
 		sp.closePort();
 	}
 
@@ -173,7 +183,8 @@ public class CSendReceiveController extends Service<String> {
 		}
 		String portId = keyPortCore[0].trim();
 		
-		System.out.println("COM: " + portId + ": " + message);
+		if (message != null)
+			System.out.print("COM: " + portId + ": " + message + " ");
 		if (controller.selectedRig() == null) {
 			System.out.println("Rig is not selected.");
 			return null;

@@ -3,8 +3,6 @@ package net.dialectech.f2aApplication;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Mixer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -18,7 +16,6 @@ import lombok.Setter;
 
 public class CUIController {
 
-	private int intData;
 	CComCenter comCenter = CComCenter.getInstance();
 	CToneGenerator toneGenerator = new CToneGenerator();
 	@Setter
@@ -264,6 +261,8 @@ public class CUIController {
 
 	@FXML
 	void onKeyPressed(KeyEvent event) {
+		// 押されるキーは何でもよいが、表示を維持するためには、↑か⇓を使うのがよい。
+		// つまり、本プログラムは殆どのキーを電鍵として把握する。
 		comCenter.addNewTimeStamp(System.currentTimeMillis(), EKeyStat.KEY_PRESSED);
 	}
 

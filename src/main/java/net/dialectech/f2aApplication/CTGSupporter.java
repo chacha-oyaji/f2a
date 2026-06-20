@@ -1,5 +1,14 @@
 package net.dialectech.f2aApplication;
 
+/*
+ * CLASS CTGSupporter
+ * 
+ * 	CToneGeneratorの支配下にあり、各種TONEを波形データとして生成するクラス。
+ * 
+ * 2026.06.18	06:27	コメント挿入
+ * 
+ */
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.Mixer;
@@ -24,6 +33,7 @@ public class CTGSupporter extends Task<String> {
 	private long atackDelayTime;
 
 	byte[][] byteBufferToneOn; // 音声用バッファ(TONE ON の場合)
+	byte[] byteBufferToneOff; // 音声用バッファ(TONE OFF直後のみ)
 
 	private int pointer2ReadTiming;
 	boolean keyOn = false;
@@ -152,10 +162,10 @@ public class CTGSupporter extends Task<String> {
 		}
 
 		switch (comCenter.getToneEffect()) {
-		case CComCenter.TONE_EFFECT_CHAPPY_UPPER_TO_LOWER:
+		case CComCenter.TONE_EFFECT_CHIRPY_UPPER_TO_LOWER:
 			fillSoundBufferWithChappyUpper2Lower(frequency, volume);
 			break;
-		case CComCenter.TONE_EFFECT_CHAPPY_LOWER_TO_UPPER:
+		case CComCenter.TONE_EFFECT_CHIRPY_LOWER_TO_UPPER:
 			fillSoundBufferWithChappyLower2Upper(frequency, volume);
 			break;
 		case CComCenter.TONE_EFFECT_GRADUALLY_ATACK:
@@ -164,6 +174,15 @@ public class CTGSupporter extends Task<String> {
 		case CComCenter.TONE_EFFECT_WHITE_NOISE:
 			fillSoundBufferWithRandomNumber(frequency, volume);
 			break;
+		case CComCenter.TONE_EFFECT_SQUARE_WAVE:
+			fillSoundBufferSquareWave(frequency, volume);
+			break;
+		case CComCenter.TONE_EFFECT_TRIANGLE_WAVE:
+			fillSoundBufferTriangleWave(frequency, volume);
+			break;
+		case CComCenter.TONE_EFFECT_HARMONY:
+			fillSoundBuffer2Harmonics(frequency, volume);
+			break;
 		case CComCenter.TONE_EFFECT_NORMAL:
 		default:
 			fillSoundBufferNormal(frequency, volume);
@@ -171,10 +190,10 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
-
 	private void fillSoundBufferWithRandomNumber(int frequency, double volume) {
-		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE - 1; ++outerIndex) {
 			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
@@ -187,10 +206,17 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
+	/**
+	 * fillSoundBufferWithChappyLower2Upperは、byteBufferToneOnにChirpy(低い方から高い方に遷移するパターン)の波形を作って設定する。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
 	private void fillSoundBufferWithChappyLower2Upper(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ
-		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
 		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE - 1; ++outerIndex) {
@@ -210,10 +236,17 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
+	/**
+	 * fillSoundBufferWithChappyUpper2Lowerは、byteBufferToneOnにChirpy(高い方から低い方に遷移するパターン)の波形を作って設定する。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
 	public void fillSoundBufferWithChappyUpper2Lower(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ
-		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
 		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE - 1; ++outerIndex) {
@@ -233,10 +266,17 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
+	/**
+	 * fillSoundBufferWithCurvedAtackは、byteBufferToneOnに正弦波の波形を作って設定する。ただし、立ち上がり時に緩やかに強まっていくパターンとする。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
 	public void fillSoundBufferWithCurvedAtack(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
-		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData = 0;
 		// 波形を生成
 		for (int outerIndex = 0; outerIndex < 2; ++outerIndex) {
@@ -259,10 +299,79 @@ public class CTGSupporter extends Task<String> {
 		}
 	}
 
+	/**
+	 * fillSoundBufferSquareWaveは、byteBufferToneOnに方形波の波形を作って設定する。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
+	public void fillSoundBufferSquareWave(int frequency, double volume) {
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
+		// bufferSizeは１波を構成するデータ数
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
+		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		short pointData;
+		// 波形を生成
+		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+				double angle = 2.0 * Math.PI * i / bufferSize;
+				pointData = (short) (Math.sin(angle) * 32767.0 * volume / 100.0);
+				if (Math.sin(angle) > 0.0)
+					pointData = (short) (32767.0 * volume / 100.0);
+				else
+					pointData = (short) (-32767.0 * volume / 100.0);
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
+		}
+	}
+
+	/**
+	 * fillSoundBufferTriangleWaveは、byteBufferToneOnに三角波の波形を作って設定する。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
+	public void fillSoundBufferTriangleWave(int frequency, double volume) {
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
+		// bufferSizeは１波を構成するデータ数
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
+		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		short pointData;
+		// 波形を生成
+		int span = bufferSize / 4;
+		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize * SOUND_BLOCK_VOLUME; i++) {
+				int angle = i % bufferSize;
+				if (angle < span) {
+					pointData = (short) (32767.0 * volume * angle / span / 100.0);
+				} else if (angle < span * 2) {
+					pointData = (short) (32767.0 * volume * (2 * span - angle) / span / 100.0);
+				} else if (angle < span * 3) {
+					pointData = (short) (-32767.0 * volume * (angle - 2 * span) / span / 100.0);
+				} else {
+					pointData = (short) (-32767.0 * volume * (4 * span - angle) / span / 100.0);
+				}
+
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
+		}
+	}
+
+	/**
+	 * fillSoundBufferNormalは、byteBufferToneOnに最も標準的な正弦波の波形を作って設定する。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
 	public void fillSoundBufferNormal(int frequency, double volume) {
 		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
-		int bufferSize = comCenter.SAMPLE_RATE / frequency;
+		int bufferSize = CComCenter.SAMPLE_RATE / frequency;
 		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * SOUND_BLOCK_VOLUME * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
 		short pointData;
 		// 波形を生成
 		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE; ++outerIndex) {
@@ -273,6 +382,75 @@ public class CTGSupporter extends Task<String> {
 				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
 			}
 		}
+	}
+
+	/**
+	 * fillSoundBufferNormalは、byteBufferToneOnに最も標準的な正弦波の波形を作って設定する。
+	 * 
+	 * @param frequency そのときの周波数（Hz）
+	 * @param volume    そのときの音量設定（%）
+	 */
+	public void fillSoundBuffer2Harmonics(int frequency, double volume) {
+		// 波長に合わせたバッファサイズを設定して波形の切れ目を防ぐ(100周期分のみ生成する。)
+		double halfPitchRatio = Math.pow(2.0, 1.0 / 12.0);
+		int secondFrequency = (int) (frequency * halfPitchRatio* halfPitchRatio* halfPitchRatio* halfPitchRatio);
+		int thirdFrequency = (int) (frequency / halfPitchRatio/  halfPitchRatio/ halfPitchRatio/ halfPitchRatio/ halfPitchRatio);
+//		int thirdFrequency = (int) (secondFrequency * halfPitchRatio*  halfPitchRatio* halfPitchRatio);
+
+		int bufferSize1 = CComCenter.SAMPLE_RATE / frequency;
+		int bufferSize2 = CComCenter.SAMPLE_RATE / secondFrequency;
+		int bufferSize3 = CComCenter.SAMPLE_RATE / thirdFrequency;
+		int bufferSize = lcm(bufferSize1, bufferSize2);
+		bufferSize = lcm(bufferSize, bufferSize3);
+		if (bufferSize>6000)
+			bufferSize = 5000;
+		
+		byteBufferToneOn = new byte[OUTER_BUFFER_SIZE][bufferSize * 2]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		byteBufferToneOff = new byte[OUTER_BUFFER_SIZE * BYTES_PER_WORD]; // 16bitのデータとするのでbuffersizeはその２倍にとっておく。
+		short pointData;
+		// 波形を生成
+		int totalindex = 0 ;
+		for (int outerIndex = 0; outerIndex < OUTER_BUFFER_SIZE; ++outerIndex) {
+			for (int i = 0, index = 0; i < bufferSize ; i++) {
+				double angle1 = 2.0 * Math.PI * totalindex / bufferSize1;
+				double angle2 = 2.0 * Math.PI * totalindex / bufferSize2;
+				double angle3 = 2.0 * Math.PI * totalindex / bufferSize3;
+				totalindex++ ;
+//				pointData = (short) ((Math.sin(angle1)+Math.sin(angle2)) * 32767.0 / 2.0 * volume / 100.0);
+				pointData = (short) ((Math.sin(angle1)+Math.sin(angle2)+Math.sin(angle3)) * 32767.0 / 3.0 * volume / 100.0);
+				byteBufferToneOn[outerIndex][index++] = (byte) ((pointData >> 8) & 0xff);
+				byteBufferToneOn[outerIndex][index++] = (byte) (pointData & 0xff);
+			}
+		}
+		System.out.println("Calculation Completed , buffer size = " + bufferSize);
+	}
+
+	// 最大公約数を求める関数
+	int gcd(int x, int y) throws Error {
+		int r;
+
+		if (x == 0 || y == 0) // 引数チェック
+		{
+			return 0; // これは引数エラー
+		}
+
+		// ユーグリッドの互除法
+		while ((r = x % y) != 0) // yで割り切れるまでループ
+		{
+			x = y;
+			y = r;
+		}
+		return y;
+	}
+
+	// 最大公約数を求める関数
+	int lcm(int x, int y) {
+		if (x == 0 || y == 0) // 引数チェック
+		{
+			return 0; // これは引数エラー
+		}
+
+		return (x * y / gcd(x, y));
 	}
 
 	private double slipAngle(double outerOffset, double innerIndex, double bufferSize) {
@@ -314,7 +492,7 @@ public class CTGSupporter extends Task<String> {
 			mixer = targetMixer;
 			atackDelayTime = (long) atackDelay;
 
-			af = new AudioFormat(comCenter.SAMPLE_RATE, 16, 1, true, true);
+			af = new AudioFormat(CComCenter.SAMPLE_RATE, 16, 1, true, true);
 
 			DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, af);
 			if (dataLineInfo != null) {
