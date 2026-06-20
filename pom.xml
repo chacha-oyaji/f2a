@@ -46,12 +46,12 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>22.0.2</version>
+			<version>21.0.8-ea+1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
-			<version>22.0.2</version>
+			<version>21.0.8-ea+1</version>
 		</dependency>
 
 		<!-- 
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.fazecast</groupId>
 			<artifactId>jSerialComm</artifactId>
-			<version>2.11.4</version>
+			<version>2.11.0</version>
 		</dependency>
 
 		<dependency>
